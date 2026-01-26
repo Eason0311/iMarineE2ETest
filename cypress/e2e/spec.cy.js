@@ -7,7 +7,7 @@ describe('iMarine 航港發展資料庫 整合測試', () => {
 
   it('點擊關於我們 會 進入關於我們', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_0').click();
+    cy.get('#header a[title="關於我們"]').click();
 
     cy.contains('h2', '關於我們').should('be.visible');
   });
@@ -46,7 +46,7 @@ describe('iMarine 航港發展資料庫 整合測試', () => {
 
   it('點擊臺灣數據統計 會 進入快捷查詢', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_2_0_0_0 a').click({ force: true });
+    cy.get('#header a[title="臺灣前十大進口貨櫃港"]').click({ force: true });
 
     cy.url().should('include', '/statistics/0/0');
     cy.contains('快捷查詢 - 臺灣前十大進口貨櫃港').should('be.visible');
@@ -66,7 +66,7 @@ describe('iMarine 航港發展資料庫 整合測試', () => {
 
   it('點擊快捷報表報表側欄 會 顯示報表 ', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/statistics/5/0');
-    cy.get('a[role="button"]').contains('貨櫃').filter(':visible').click();
+    cy.get('div[role="tabpanel"] a[role="button"]').contains('貨櫃').filter(':visible').click();
     cy.get('.statistics-second-title').contains('進口/TEU').filter(':visible').click();
 
     cy.contains('快捷查詢 - 臺灣前十大進口貨櫃港').should('be.visible');
@@ -74,51 +74,58 @@ describe('iMarine 航港發展資料庫 整合測試', () => {
 
   it('點擊首頁臺灣航運指數卡片 會 顯示航運指數', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#points').contains('國籍船舶總噸100以上登記數').click({ focus: true });
+    cy.get('#sidebar li[title="航運指數"]').click();
+    cy.get('#points button[aria-label*="查看"]').filter(':visible').first().click();
 
     cy.contains('button', '重置縮放').should('be.visible');
   });
 
   it('點擊臺灣數據統計-簡易查詢-港口 會 進入國際商港貨物吞吐量(萬公噸)', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_2_1_0_2 a').click({ force: true });
+    cy.get('#header  a[title="國際商港貨物吞吐量"]').click({ force: true });
 
     cy.contains('國際商港貨物吞吐量(萬公噸)').should('be.visible');
   });
 
-  it('點擊臺灣數據統計 會 進入自訂查詢', () => {
+  it('點擊臺灣數據統計自訂查詢 會 進入自訂查詢', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_2_2 a').click({ force: true });
+    cy.get('#header').within(() => {
+      cy.contains('a, span', '臺灣數據統計').click();
+      cy.get('a[title="自訂查詢"]').should('be.visible').click();
+    });
+
 
     cy.contains('自訂維度選項').should('be.visible');
   });
 
-  it('點擊海運焦點新聞 會 進入海運焦點新聞', () => {
+  it('點擊海運焦點新聞-全部 會 進入海運焦點新聞', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_3 > div > a ').click();
-    cy.get('ul[aria-labelledby="topbar_3_label"]').within(() => {
-      cy.contains('全部').should('be.visible');
-      cy.contains('港口').should('be.visible');
-      cy.contains('航商').should('be.visible');
-      cy.contains('船員').should('be.visible');
-      cy.contains('船舶').should('be.visible');
-      cy.contains('環境').should('be.visible');
-      cy.contains('社論').should('be.visible');
+    cy.get('#header').within(() => {
+      cy.contains('a, span', '海運焦點新聞').click();
+      cy.get('a[title="全部"]').should('be.visible').click();
     });
+
+    cy.contains('h2', '海運焦點新聞').should('be.visible');
   });
 
   it('點擊海運焦點新聞-港口 會 進入港口類新聞', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_3_1 > div > a > div > div > span').click({ force: true });
+    cy.get('#header')
+      .filter(':visible')
+      .first()
+      .within(() => {
+        cy.contains('a, span', '海運焦點新聞').click();
+        cy.get('a[title="港口"]').filter(':visible').first().click();
+      });
 
     cy.contains('h2', '海運焦點新聞').should('be.visible');
   });
 
   it('點擊航港法令 會 進入航港法令目錄', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_4').click();
+    cy.get('#header').within(() => {
+      cy.contains('a, span', '航港法令').click();
 
-    cy.get('#topbar_4 [aria-labelledby="topbar_4_label"]').within(() => {
       cy.contains('航港法令索引').should('be.visible');
       cy.contains('法令').should('be.visible');
       cy.contains('公告').should('be.visible');
@@ -128,10 +135,13 @@ describe('iMarine 航港發展資料庫 整合測試', () => {
 
   it('點擊航港法令-航務法令 會 進入航務法令', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_4').click();
-    cy.get('#topbar_4').contains('a', '航港法令索引').click();
 
-    cy.contains('h2', '航港法令').should('be.visible');
+    cy.get('#header').within(() => {
+      cy.contains('a, span', '航港法令').click();
+      cy.get('ul.p-submenu-list').filter(':visible').contains('a', '航務法令').click({ force: true });
+    });
+
+    cy.contains('h2', '航務法令').should('be.visible');
   });
 
   it('點擊航務法令 會 出現航務法令', () => {
@@ -143,23 +153,22 @@ describe('iMarine 航港發展資料庫 整合測試', () => {
 
   it('點擊訊息分享>重要公告 會 進入重要公告', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_5_0 > div > a > div > div > span').click({ force: true });
+    cy.get('#header').within(() => {
+      cy.contains('a, span', '訊息分享').click();
+      cy.get('a[title="重要公告"]').should('be.visible').click();
+    });
 
     cy.contains('h2', '重要公告').should('be.visible');
   });
 
-  it('點擊海運組織 會 進入國外海運組織', () => {
+  it('點擊海運組織 會 進入國內外海運組織', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_6 > div > a > span').click();
+    cy.get('#header').within(() => {
+      cy.contains('a, span', '海運組織').click();
+    });
 
     cy.contains('h2', '國外海運組織').should('be.visible');
-  });
-
-  it('點擊海運組織 會 進入國內海運組織', () => {
-    cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_6').contains('a', '海運組織').click({ force: true });
-
-    cy.contains('國內海運公協會').scrollIntoView().should('be.visible');
+    cy.contains('h2', '國內海運組織').should('be.visible');
   });
 
   it('點擊船舶即時資訊 會 進入船舶即時資訊', () => {
@@ -246,28 +255,34 @@ describe('iMarine 航港發展資料庫 整合測試', () => {
 
   it('點擊郵輪旅客國籍 會 進入郵輪旅客國籍', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_2_0_3_5  a  span').click({ force: true });
+    cy.get('#sidebar li[title="快捷查詢"]').click();
+    cy.contains('a, span', '臺灣郵輪旅客各國籍人次').click({ force: true });
 
     cy.contains('h2', '快捷查詢 - 臺灣郵輪旅客各國籍人次').should('be.visible');
   });
 
   it('點擊海港自由港區進口貿易值貿易量 會 進入海港自由港區進口貿易值貿易量', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_2_0_4_0  a  span').click({ force: true });
+    cy.get('#sidebar li[title="快捷查詢"]').click();
+    cy.contains('a, span', '海港自由港區進口貿易值貿易量').click({ force: true });
 
     cy.contains('h2', '快捷查詢 - 海港自由港區進口貿易值貿易量').should('be.visible');
   });
 
   it('點擊臺灣進出口國輪外輪承運量 會 進入臺灣進出口國輪外輪承運量', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_2_0_1_6  a  span').click({ force: true });
+    cy.get('#sidebar li[title="快捷查詢"]').click();
+    cy.contains('a, span', '臺灣進出口國輪外輪承運量').click({ force: true });
 
     cy.contains('h2', '快捷查詢 - 臺灣進出口國輪外輪承運量').should('be.visible');
   });
 
   it('點擊航港小知識 會 進入航港小知識', () => {
     cy.visit('https://imarine.motcmpb.gov.tw/#/');
-    cy.get('#topbar_5_1 > div  a  span').click({ force: true });
+    cy.get('#header').within(() => {
+      cy.contains('a, span', '訊息分享').click();
+      cy.get('a[title="航港小知識"]').should('be.visible').click();
+    });
 
     cy.contains('h2', '航港小知識').should('be.visible');
   });
