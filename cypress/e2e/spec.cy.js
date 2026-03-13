@@ -340,7 +340,7 @@ describe('iMarine 航港發展資料庫 整合測試', () => {
     cy.get('.mt-3.text-center > .p-button').click();
     cy.get('.swal2-actions > button').contains('OK').click();
     cy.get('.p-chips-input-token > input').should('be.visible').type('港口', { force: true }).type('{enter}');
-    cy.get('button').contains('儲存').click();
+    cy.get('body > div.p-dialog-mask.p-component-overlay.p-component-overlay-enter > div > div.p-dialog-footer > div > button.p-button.p-component.p-button-sm.text-overflow-ellipsis.text-base.btn-search-time').contains('儲存').click();
     cy.get('.swal2-actions > button').contains('OK').click();
     cy.get('.p-card-content > .flex-column > :nth-child(2)').click();
 
